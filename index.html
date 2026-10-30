@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMART TRADING BOT</title>
+<style>
+:root{--bg:#05070a;--panel:#151a22;--line:#303946;--green:#39ff14;--muted:#aeb8c7;--orange:#ffb12e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#111923,#030406 65%);color:#eaf0f8;font:14px Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #28303b;background:#0b0e13;position:sticky;top:0;z-index:2}
+h1{font-size:clamp(20px,3vw,34px);margin:0;text-align:center}h1 span,.green{color:var(--green)}button,select,input{font:inherit}button{cursor:pointer;border:1px solid #485363;border-radius:8px;padding:10px 14px;color:#eef4fb;background:linear-gradient(#242b35,#11151b)}button:hover{border-color:var(--green)}button.primary{color:var(--green);font-weight:bold}.status{border:1px solid #596474;border-radius:7px;padding:8px;color:var(--muted)}
+main{max-width:1500px;margin:auto;padding:14px;display:grid;grid-template-columns: minmax(250px, .95fr) minmax(400px,2fr);gap:12px}
+.left,.right{display:flex;flex-direction:column;gap:12px}.panel{background:linear-gradient(145deg,#1b2029,#10141b);border:1px solid var(--line);border-radius:10px;padding:13px;box-shadow:inset 0 1px 0 #ffffff0b}
+.panel h2{margin:-1px 0 13px;text-align:center;color:var(--green);font-size:15px;text-transform:uppercase;border-bottom:1px solid #303744;padding-bottom:10px}
+label{display:block;color:#dce4ef;margin:7px 0 5px}input,select{width:100%;background:#080b10;border:1px solid #414b59;color:#f1f5fa;border-radius:7px;padding:10px;min-width:0}input:focus,select:focus{outline:1px solid var(--green)}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.radio{display:flex;align-items:center;gap:8px;margin:9px 0;color:#d7e0ec}.radio input{width:auto;accent-color:var(--green)}.metric{background:#090c11;border:1px solid #272f3a;border-radius:8px;padding:12px;text-align:center}.metric strong{display:block;font-size:25px;color:var(--green);margin-top:5px}.metric small{color:var(--muted)}.tablewrap{overflow:auto;min-height:230px}table{width:100%;border-collapse:collapse;min-width:520px}th{background:#19db0c;color:#001500;font-size:14px;padding:10px}td{padding:10px;border-bottom:1px solid #28303b;text-align:center}.banner{padding:12px;text-align:center;color:var(--orange);font-weight:bold;background:#11151b;border:1px solid #3c4551;border-radius:7px}.notice{font-size:12px;line-height:1.5;color:#c0cad7;border-left:3px solid var(--orange);padding:8px 10px;background:#19150e}.full{grid-column:1/-1}.muted{color:var(--muted)}footer{padding:14px 20px;color:#9da8b8;border-top:1px solid #252c36;text-align:center}
+@media(max-width:850px){main{grid-template-columns:1fr}.full{grid-column:auto}header{flex-wrap:wrap}h1{order:-1;width:100%}.row3{grid-template-columns:1fr 1fr}}
+</style></head>
+<body>
+<header>
+<button id="start" class="primary">▶ INICIAR ANÁLISIS</button>
+<h1>SMART TRADING <span>BOT</span></h1>
+<div class="status" id="connection">● MODO DEMO LOCAL</div>
+<button id="stop">PARAR</button>
+</header>
+<main>
+<section class="left">
+<div class="panel"><h2>Gestión de riesgo</h2><div class="row">
+<div><label>Entrada por operación ($)</label><input id="stake" type="number" min="1" value="5"></div>
+<div><label>Meta de ganancia ($)</label><input id="target" type="number" min="1" value="20"></div>
+<div><label>Límite de pérdida ($)</label><input id="loss" type="number" min="1" value="10"></div>
+<div><label>Máx. operaciones</label><input id="maxops" type="number" min="1" value="10"></div></div>
+<p class="muted">La meta y el límite solo sirven para detener la simulación; no garantizan resultados.</p>
+</div>
+<div class="panel"><h2>Estrategia de análisis</h2>
+<div class="metric" style="text-align:left"><strong style="font-size:17px;text-align:center">MÉTODO COMBINADO</strong><p>Indicadores técnicos: RSI, MACD y medias móviles.</p><p>Lectura del precio: tendencia, velas japonesas, soportes y resistencias.</p><p class="muted">La señal solo debe considerarse cuando varios elementos coincidan. En esta versión no hay cotizaciones reales, por lo que todavía no se calcula una señal técnica auténtica.</p></div>
+</div>
+<div class="panel"><h2>Mercado de divisas</h2>
+<label>Mercado disponible</label><select id="pair"><option>Divisas — EUR/USD</option><option>Divisas — GBP/USD</option><option>Divisas — USD/JPY</option><option>Divisas — USD/CHF</option><option>Divisas — AUD/USD</option><option>Divisas — USD/CAD</option><option>Divisas — NZD/USD</option><option>Otros mercados del broker (pendiente de catálogo real)</option></select>
+<label>Tipo de cuenta</label><select id="account"><option value="demo">Demo — pruebas sin dinero real</option><option value="real">Real — órdenes bloqueadas hasta validar seguridad</option></select>
+<label>Temporalidad de análisis</label><select id="period"><option value="1">1 minuto</option><option value="5">5 minutos</option><option value="15">15 minutos</option></select>
+<label>Modo</label><div class="radio"><input type="radio" name="mode" value="manual" checked> Manual (señales; tú decides)</div><div class="radio"><input type="radio" name="mode" value="auto" disabled> Automático (no habilitado)</div>
+<label>Dirección a evaluar</label><select id="direction"><option>Automática</option><option>CALL / Subida</option><option>PUT / Bajada</option></select>
+<button id="signal" style="width:100%;margin-top:8px">GENERAR SEÑAL DE DEMOSTRACIÓN</button>
+</div>
+<div class="panel"><h2>Resultados de simulación</h2><div class="row">
+<div class="metric"><small>Balance simulado</small><strong id="balance">$0.00</strong></div>
+<div class="metric"><small>Ganancia / pérdida</small><strong id="pnl">$0.00</strong></div>
+<div class="metric"><small>Wins</small><strong id="wins">0</strong></div>
+<div class="metric"><small>Losses</small><strong id="losses">0</strong></div></div>
+<p class="muted">Acierto: <b id="accuracy">0%</b> · Operaciones: <b id="count">0</b></p>
+<button id="reset" style="width:100%">RESTABLECER SIMULACIÓN</button>
+</div>
+</section>
+<section class="right">
+<div class="panel"><h2>Estado del sistema</h2><div class="row3">
+<div class="metric"><small>Broker</small><strong style="font-size:17px">Pendiente</strong></div>
+<div class="metric"><small>Mercados</small><strong style="font-size:17px">Catálogo pendiente</strong></div>
+<div class="metric"><small>Órdenes reales</small><strong style="font-size:17px;color:#ffb12e">BLOQUEADAS</strong></div></div>
+<p class="muted" id="message">Listo. Esta versión permite probar la interfaz y el registro de operaciones ficticias.</p>
+</div>
+<div class="panel"><h2>Operaciones registradas</h2><div class="tablewrap"><table><thead><tr><th>Hora</th><th>Par</th><th>Dirección</th><th>Entrada</th><th>Resultado</th><th>Estado</th></tr></thead><tbody id="trades"></tbody></table></div></div>
+<div class="notice"><b>Conexión real:</b> esta versión no inicia sesión en IQ Option ni envía órdenes al broker. Antes de habilitar dinero real se necesita confirmar una API oficial/permitida, implementar autenticación segura, probar en demo y validar límites de riesgo. No introduzcas contraseñas ni tokens del broker en esta página.</div>
+<div class="banner" id="runstate">PARADO · SIMULACIÓN</div>
+</section>
+</main><footer>SMART TRADING BOT · Configuración manual · Sin conexión a broker; órdenes reales bloqueadas</footer>
+<script>
+let running=false, pnl=0,wins=0,losses=0,count=0,balance=0,timer=null;
+const $=id=>document.getElementById(id), money=n=>'$'+n.toFixed(2);
+function render(){ $('pnl').textContent=money(pnl);$('balance').textContent=money(balance);$('wins').textContent=wins;$('losses').textContent=losses;$('count').textContent=count;$('accuracy').textContent=(count?wins/count*100:0).toFixed(1)+'%';}
+function signal(){if(!running){$('message').textContent='Pulsa INICIAR ANÁLISIS antes de generar una señal.';return}
+ const stake=Math.max(1,Number($('stake').value)||1), dir=$('direction').value==='Automática'?(Math.random()>.5?'CALL / Subida':'PUT / Bajada'):$('direction').value;
+ $('message').textContent='Método combinado seleccionado (RSI, MACD, medias móviles, tendencia, velas y soportes/resistencias). No se puede confirmar '+dir+' para '+$('pair').value+' porque esta versión no recibe cotizaciones reales. Señal de demostración únicamente; no operar basándose en ella.';
+ /* Modo manual: solo registra la señal; no ejecuta órdenes. */
+}
+function trade(stake,dir){if(!running)return;const won=Math.random()>.5;const result=won?stake*.75:-stake;pnl+=result;balance+=result;count++;if(won)wins++;else losses++;
+ const tr=document.createElement('tr');tr.innerHTML=`<td>${new Date().toLocaleTimeString()}</td><td>${$('pair').value}</td><td>${dir}</td><td>${money(stake)}</td><td style="color:${won?'#39ff14':'#ff6464'}">${money(result)}</td><td>${won?'WIN (simulado)':'LOSS (simulado)'}</td>`;$('trades').prepend(tr);render();
+ if(pnl>=Number($('target').value)||pnl<=-Number($('loss').value)||count>=Number($('maxops').value)){stop();$('message').textContent='Simulación detenida por alcanzar una meta/límite configurado.'}
+}
+function start(){running=true;$('runstate').textContent='EN MARCHA · SOLO DEMOSTRACIÓN';$('connection').textContent='● DEMO LOCAL · SIN BROKER';$('message').textContent='Panel iniciado en modo manual con estrategia combinada. No se consultan precios reales, no se calculan indicadores con datos del mercado y no se envían órdenes.';/* La ejecución automática queda deshabilitada. */}
+function stop(){running=false;clearInterval(timer);timer=null;$('runstate').textContent='PARADO · SIMULACIÓN';}
+$('start').onclick=start;$('stop').onclick=stop;$('signal').onclick=signal;
+$('reset').onclick=()=>{stop();pnl=0;balance=0;wins=0;losses=0;count=0;$('trades').innerHTML='';render();$('message').textContent='Simulación restablecida.'};
+</script></body></html>
